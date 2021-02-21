@@ -12,6 +12,8 @@ class MouseTooltip {
 
     this.tooltip = document.getElementById("ctooltip");
     this.copyText = "";
+
+    this.txtHtmHeader = "";
     this.txtToDisplay = "";
 
     document.addEventListener("mousemove", (e) => {
@@ -64,7 +66,7 @@ class MouseTooltip {
 
   displayCSSData_test() {
     this.txtToDisplay = "";
-
+    this.txtHtmHeader = "";
     const matchS = (expr, nStr) => {
       return nStr.match(expr) !== null;
     };
@@ -85,17 +87,34 @@ class MouseTooltip {
     let ss = document.styleSheets[0];
 
     let i = 0;
+    let pointOfCursorFocus = document
+    .elementFromPoint(this.cursorX, this.cursorY);
+    /*
+    //class 
+    pp(document
+        .elementFromPoint(this.cursorX, this.cursorY)
+        .getAttribute('class'));
+    //id
+    pp(document
+      .elementFromPoint(this.cursorX, this.cursorY)
+      .getAttribute('id'));
+    */
+      //TODO get htm attributes
+
+    
+    if (typeof pointOfCursorFocus.attributes[0] !== 'undefined'){
+      
+      pp(pointOfCursorFocus.attributes[0].name + "=" +pointOfCursorFocus.attributes[0].value+"\n");
+    }
 
     if (
-      document
-        .elementFromPoint(this.cursorX, this.cursorY)
+      pointOfCursorFocus
         .getAttribute("class")
     ) {
       for (i = 0; i < ss.cssRules.length; i++) {
         if (
           matchS(
-            document
-              .elementFromPoint(this.cursorX, this.cursorY)
+            pointOfCursorFocus
               .getAttribute("class"),
             ss.cssRules[i].cssText
           )
@@ -107,13 +126,12 @@ class MouseTooltip {
     }
 
     if (
-      document.elementFromPoint(this.cursorX, this.cursorY).getAttribute("id")
+      pointOfCursorFocus.getAttribute("id")
     ) {
       for (i = 0; i < ss.cssRules.length; i++) {
         if (
           matchS(
-            document
-              .elementFromPoint(this.cursorX, this.cursorY)
+            pointOfCursorFocus
               .getAttribute("id"),
             ss.cssRules[i].cssText
           )
