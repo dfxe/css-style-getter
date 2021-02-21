@@ -1,0 +1,39 @@
+body {
+  background-color: darkgray;
+}
+
+.links {
+    margin: 100px;
+    text-align: center;
+    font-family: "Courier New", Courier, monospace;
+    color: darkblue;
+}
+
+.links:hover #ctooltip {
+  display: block;
+}
+
+#ctooltip {
+  display: block;
+  background: #c8c8c8;
+
+  width: 10em;
+  height: 12em;
+
+  margin-left: 2em;
+  padding: 2em;
+
+  text-align: left;
+  justify-content: left;
+
+  position: absolute;
+  z-index: 9999;
+  
+  font-family: "Courier New", Courier, monospace;
+  color: darkblue;
+}
+
+
+
+
+
