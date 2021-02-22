@@ -13,18 +13,17 @@ body {
   display: block;
 }
 
-#ctooltip {
+.ctts {
   display: block;
   background: #c8c8c8;
 
-  width: 10em;
-  height: 12em;
+  width: 15em;
+  height: 17em;
 
   margin-left: 2em;
   padding: 2em;
 
-  text-align: left;
-  justify-content: left;
+  
 
   position: absolute;
   z-index: 9999;
