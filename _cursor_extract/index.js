@@ -16,6 +16,8 @@ class MouseTooltip {
     this.txtHtmHeader = "";
     this.txtToDisplay = "";
 
+    this.legalCSSInput = ["id", "class"];
+
     document.addEventListener("mousemove", (e) => {
       if (this.lockTooltip) {
         this.tooltip.style.left = e.pageX + "px";
@@ -58,37 +60,63 @@ class MouseTooltip {
     //
   }
 
-  extractCSS() {
-    //let x = document.elementFromPoint(this.cursorX,this.cursorY).attributes;
-    //for(let i of x)
-    //    pp(i);
+  foundInString = (expr, nStr) => {
+    return nStr.match(expr) !== null;
+  };
+
+  extractCSS(byAttribute, elementToView) {
+    if (
+      byAttribute === false ||
+      
+      elementToView === null ||
+      elementToView === "undefined"
+    ) {
+      return "";
+    }
+    let outputTxt = "";
+    for (const it of this.legalCSSInput) {
+      if (it === byAttribute) {
+        if (elementToView.getAttribute(it)) {
+          for (let i = 0; i < document.styleSheets[0].cssRules.length; i++) {
+            if (
+              this.foundInString(
+                elementToView.getAttribute(it),
+                document.styleSheets[0].cssRules[i].cssText
+              )
+            )
+              outputTxt += this.prettyTextFormat(
+                document.styleSheets[0].cssRules[i].cssText
+              );
+          }
+        }
+      }
+    }
+
+    return outputTxt;
   }
+
+  prettyTextFormat = (nStr) => {
+    //adds return character
+    let nuStr = nStr;
+
+    const endLn = /; /gm;
+    const propertyBegin = / { /gm;
+    const propertyEnd = /}/gm;
+    nuStr = nuStr.replace(endLn, ";\n");
+    nuStr = nuStr.replace(propertyBegin, " {\n");
+    nuStr = nuStr.replace(propertyEnd, "}\n");
+    return nuStr;
+  };
 
   displayCSSData_test() {
     this.txtToDisplay = "";
     this.txtHtmHeader = "";
-    const matchS = (expr, nStr) => {
-      return nStr.match(expr) !== null;
-    };
-
-    const prettyTxtFormat = (nStr) => {
-      //adds return character
-      let nuStr = nStr;
-
-      const endLn = /; /gm;
-      const propertyBegin = / { /gm;
-      const propertyEnd = /}/gm;
-      nuStr = nuStr.replace(endLn, ";\n");
-      nuStr = nuStr.replace(propertyBegin, " {\n");
-      nuStr = nuStr.replace(propertyEnd, "}\n");
-      return nuStr;
-    };
-
-    let ss = document.styleSheets[0];
 
     let i = 0;
-    let pointOfCursorFocus = document
-    .elementFromPoint(this.cursorX, this.cursorY);
+    let pointOfCursorFocus = document.elementFromPoint(
+      this.cursorX,
+      this.cursorY
+    );
     /*
     //class 
     pp(document
@@ -99,62 +127,24 @@ class MouseTooltip {
       .elementFromPoint(this.cursorX, this.cursorY)
       .getAttribute('id'));
     */
-      //TODO get htm attributes
+    //TODO get htm attributes
 
-    
-    if (typeof pointOfCursorFocus.attributes[0] !== 'undefined'){
-      
-      pp(pointOfCursorFocus.attributes[0].name + "=" +pointOfCursorFocus.attributes[0].value+"\n");
+    if (typeof pointOfCursorFocus.attributes[0] !== "undefined") {
+      pp(
+        pointOfCursorFocus.attributes[0].name +
+          "=" +
+          pointOfCursorFocus.attributes[0].value +
+          "\n"
+      );
     }
 
-    if (
-      pointOfCursorFocus
-        .getAttribute("class")
-    ) {
-      for (i = 0; i < ss.cssRules.length; i++) {
-        if (
-          matchS(
-            pointOfCursorFocus
-              .getAttribute("class"),
-            ss.cssRules[i].cssText
-          )
-        )
-          this.txtToDisplay += prettyTxtFormat(ss.cssRules[i].cssText);
-      }
-    } else {
-      this.txtToDisplay = "";
-    }
-
-    if (
-      pointOfCursorFocus.getAttribute("id")
-    ) {
-      for (i = 0; i < ss.cssRules.length; i++) {
-        if (
-          matchS(
-            pointOfCursorFocus
-              .getAttribute("id"),
-            ss.cssRules[i].cssText
-          )
-        )
-          this.txtToDisplay += prettyTxtFormat(ss.cssRules[i].cssText);
-      }
-    }
-
-    this.tooltip.innerHTML = this.txtToDisplay;
+    this.tooltip.innerHTML = this.extractCSS("class",pointOfCursorFocus);
 
     //formatTooltipText(ss.cssRules[1].cssText);
     //pp(document.querySelector("#content3").getAttribute("style"));
   }
 
-  cssk() {
-    //found it !!!
-    //pp(ss.cssRules[2].cssText);
-    const matchS = (expr, nStr) => {
-      return nStr.match(expr) !== null;
-    };
-
-    pp(matchS("nova", "#nova"));
-  }
+  
 
   toggleLockTooltip() {
     this.lockTooltip = !this.lockTooltip;
