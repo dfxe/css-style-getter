@@ -216,7 +216,7 @@ class MouseTooltip {
 
 class MouseTooltipControl {
   constructor() {
-    [this.cX,this.cY] = [0,0];
+    [this.cX, this.cY] = [0, 0];
     this.current;
     this.mtLL = new LinkedList();
     document.addEventListener("keydown", (e) => {
@@ -250,17 +250,17 @@ class MouseTooltipControl {
     this.mtLL.add(this.current);
     //pp(this.mtStack.printStack())
 
-    document.addEventListener("mousemove", (e) => {
-      if (this.current.lockTooltip === false) {
-        this.current.tooltip.style.left = e.pageX + "px";
-        this.current.tooltip.style.top = e.pageY + "px";
-        this.current.cursorX = this.cX;
-        this.current.cursorY = this.cY;
-      }
-    });
+    const followTooltip = (e) => {
+      
+        if (this.current.lockTooltip === false) {
+          this.current.tooltip.style.left = e.pageX + "px";
+          this.current.tooltip.style.top = e.pageY + "px";
+          this.current.cursorX = this.cX;
+          this.current.cursorY = this.cY;
+        }
+    }
 
-    document.addEventListener("mousedown", (e) => {
-      //copy css
+    const clickToCopy = (e) =>{
       if (this.current.lockTooltip === false) {
         navigator.clipboard.writeText(this.current.txtToDisplay);
         this.current.tooltip.style.backgroundColor = "#c8e6c9";
@@ -279,7 +279,13 @@ class MouseTooltipControl {
         timerez(1, this.current.tooltip);
         clearInterval(timerez);
       }
-    });
+    }
+
+    
+
+    document.addEventListener("mousemove", followTooltip);
+
+    document.addEventListener("mousedown", clickToCopy);
 
     setInterval(() => {
       if (this.current.lockTooltip === false) {
@@ -287,11 +293,15 @@ class MouseTooltipControl {
       }
     }, 300);
 
-    
+    //TODO element still exists in js runtime (this is bad)
+    //to remove an e listener, an external function needs be developed. 
+    //lambdas don't work
     this.current.tooltipDeleteButton.addEventListener("click", () => {
+      document.removeEventListener("mousemove", followTooltip);
+
+      document.removeEventListener("mousedown", clickToCopy);
       TooltipUtils.destroyTooltip(
-        document.elementFromPoint(this.cX, this.cY)
-          .parentElement.id
+        document.elementFromPoint(this.cX, this.cY).parentElement.id
       );
     });
   }
