@@ -83,9 +83,6 @@ class TooltipUtils {
 
     ttDeleteBtn.className = "tt-delete-btn";
     ttDeleteBtn.innerHTML = "X";
-    ttDeleteBtn.addEventListener("click", () => {
-      this.destroyTooltip(this.lastTooltipId);
-    });
 
     document.body.appendChild(tt);
 
@@ -97,6 +94,7 @@ class TooltipUtils {
       document.getElementById(this.lastTooltipId),
       ttInteriorHeader,
       ttInteriorBody,
+      ttDeleteBtn,
     ];
   }
 
@@ -114,6 +112,7 @@ class MouseTooltip {
       this.tooltip,
       this.tooltipHeader,
       this.tooltipBody,
+      this.tooltipDeleteButton,
     ] = TooltipUtils.instantiateTooltip();
 
     this.txtHtmHeader = "";
@@ -217,6 +216,7 @@ class MouseTooltip {
 
 class MouseTooltipControl {
   constructor() {
+    [this.cX,this.cY] = [0,0];
     this.current;
     this.mtLL = new LinkedList();
     document.addEventListener("keydown", (e) => {
@@ -238,6 +238,11 @@ class MouseTooltipControl {
           break;
       }
     });
+
+    document.addEventListener("mousemove", (e) => {
+      this.cX = e.pageX;
+      this.cY = e.pageY;
+    });
   }
 
   createMouseTooltip() {
@@ -249,29 +254,31 @@ class MouseTooltipControl {
       if (this.current.lockTooltip === false) {
         this.current.tooltip.style.left = e.pageX + "px";
         this.current.tooltip.style.top = e.pageY + "px";
-        this.current.cursorX = e.pageX;
-        this.current.cursorY = e.pageY;
+        this.current.cursorX = this.cX;
+        this.current.cursorY = this.cY;
       }
     });
 
     document.addEventListener("mousedown", (e) => {
       //copy css
-      navigator.clipboard.writeText(this.current.txtToDisplay);
-      this.current.tooltip.style.backgroundColor = "#c8e6c9";
-      this.current.tooltipHeader.innerText = "CSS now on clipboard.";
-      this.current.tooltipBody.innerText = "";
-      const timerez = (duration, fxObject) => {
-        let seconds = duration;
-        setInterval(function () {
-          fxObject.style.backgroundColor = "lightgray";
-          if (seconds-- < 0) {
-            return;
-          }
-        }, 1000);
-      };
+      if (this.current.lockTooltip === false) {
+        navigator.clipboard.writeText(this.current.txtToDisplay);
+        this.current.tooltip.style.backgroundColor = "#c8e6c9";
+        this.current.tooltipHeader.innerText = "CSS now on clipboard.";
+        this.current.tooltipBody.innerText = "";
+        const timerez = (duration, fxObject) => {
+          let seconds = duration;
+          setInterval(function () {
+            fxObject.style.backgroundColor = "lightgray";
+            if (seconds-- < 0) {
+              return;
+            }
+          }, 1000);
+        };
 
-      timerez(1, this.current.tooltip);
-      clearInterval(timerez);
+        timerez(1, this.current.tooltip);
+        clearInterval(timerez);
+      }
     });
 
     setInterval(() => {
@@ -279,6 +286,14 @@ class MouseTooltipControl {
         this.current.displayCSSData();
       }
     }, 300);
+
+    
+    this.current.tooltipDeleteButton.addEventListener("click", () => {
+      TooltipUtils.destroyTooltip(
+        document.elementFromPoint(this.cX, this.cY)
+          .parentElement.id
+      );
+    });
   }
 }
 

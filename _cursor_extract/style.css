@@ -5,7 +5,7 @@ body {
 .links {
     margin: 100px;
     text-align: center;
-    font-family: "Courier New", Courier, monospace;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     color: darkblue;
 }
 
@@ -29,7 +29,7 @@ body {
   position: absolute;
   z-index: 1;
   
-  font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   color: darkblue;
 }
 
