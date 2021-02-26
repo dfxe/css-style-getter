@@ -14,7 +14,8 @@ body {
 }
 
 .ctts {
-  display: block;
+  display: flex;
+  justify-content: flex-start;
   background: #c8c8c8;
 
   width: 15em;
@@ -26,14 +27,35 @@ body {
   
 
   position: absolute;
-  z-index: 9999;
+  z-index: 1;
   
-  font-family: "Courier New", Courier, monospace;
+  font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
   color: darkblue;
 }
 
 #crakatau{
     text-align: center;
+}
+
+.tt-delete-btn{
+  background-color: black;
+  font-family: 'Courier New', Courier, monospace;
+  color:blanchedalmond;
+  display: block;
+  margin-right: 1em;
+  z-index: 2;
+  border-bottom-style: hidden;
+  border-top-style: hidden;
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+
+.tt-interior-header{
+
+}
+
+.tt-interior-body{
+
 }
 
 
