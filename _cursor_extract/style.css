@@ -1,22 +1,29 @@
 body {
-  background-color: darkgray;
+  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  background-color: #606060FF;
 }
 
-.links {
+h1{
+  text-align: center;
+}
+
+#hdd{
+  color:#D6ED17FF;
+}
+
+.items {
     margin: 100px;
     text-align: center;
     font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     color: white;
+    box-shadow: tan 1px 1px 1px
 }
 
-.links:hover #ctooltip {
-  display: block;
-}
 
 .ctts {
   display: flex;
   justify-content: flex-start;
-  background: #c8c8c8;
+  background: #D6ED17FF;
 
   width: 15em;
   height: 17em;
@@ -33,11 +40,9 @@ body {
   
 }
 
-
-
-
-#crakatau{
+#id-link{
     text-align: center;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px, rgb(51, 51, 51) 0px 0px 0px 3px;
 }
 
 .tt-delete-btn{
@@ -63,6 +68,19 @@ b.tt-interior-body{
 
 .tt-body-tag-text{
   color:brown;
+}
+
+#toolbox{
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px, rgb(51, 51, 51) 0px 0px 0px 3px;
+}
+
+#tips{
+  font-size: large;
+  color:white;
+}
+#toolbox>section{
+  color:#D6ED17FF;
+  font-size: medium;
 }
 
 

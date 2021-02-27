@@ -6,11 +6,25 @@ html(lang='en')
         link(rel='stylesheet',href='/style.css')
         
     body
-        h1 Cursor trial 
-        div.links First link
-        div.links Second link 
-        div.links Third link
-        div.crakatau nissan
+        header 
+        h1#hdd CSS style getter 
+        div.items First item
+        div#id-link Second item 
+        div.items Third item
         
+        footer#toolbox
+            div#tips How to use
+            section Press 
+                b 'S' to lock tooltip 
+            section Press 
+                b 'C' to create new tooltip
+            section Press 
+                b the left mouse button to copy the style of an element
+            section Press the
+                b 'X' button bar on the left of the tooltip to remove it
+            section 
+                b *Note: Currently only supports stylesheet extraction. 
+            
+
         
         script(src='/index.js')

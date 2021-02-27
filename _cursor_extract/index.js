@@ -127,18 +127,17 @@ class MouseTooltip {
     return nStr.match(expr) !== null;
   };
 
-  extractCSS(byAttribute, elementToView) {
+  extractCSS(attributesToCheck, elementToView) {
     //needs to include "tagName" check
     if (
-      byAttribute === false ||
+      
       elementToView === null ||
       elementToView === "undefined"
     ) {
       return "";
     }
     let outputTxt = "";
-    for (const it of TooltipUtils.legalInput) {
-      if (it === byAttribute) {
+    for (const it of attributesToCheck) {
         if (elementToView.getAttribute(it)) {
           for (let i = 0; i < document.styleSheets[0].cssRules.length; i++) {
             if (
@@ -152,7 +151,7 @@ class MouseTooltip {
               );
           }
         }
-      }
+
     }
 
     return outputTxt;
@@ -217,11 +216,11 @@ class MouseTooltip {
     this.txtToDisplay =
       pointOfCursorFocus.tagName.toLocaleLowerCase() +
       "\n" +
-      this.prettyTextFormat(this.extractCSS("class", pointOfCursorFocus));
+      this.prettyTextFormat(this.extractCSS(TooltipUtils.legalInput, pointOfCursorFocus));
 
     this.tooltipHeader.innerText = pointOfCursorFocus.tagName.toLocaleLowerCase() + "\n";
     this.tooltipBody.innerHTML = this.prettyTextFormatEmphasis(
-      this.prettyTextFormat(this.extractCSS("class", pointOfCursorFocus))
+      this.prettyTextFormat(this.extractCSS(TooltipUtils.legalInput, pointOfCursorFocus))
     );
   }
 
@@ -238,7 +237,6 @@ class MouseTooltipControl {
       if (e.defaultPrevented) {
         return;
       }
-
       switch (e.code) {
         case "KeyC":
           this.current.lockTooltip = true;
@@ -282,7 +280,7 @@ class MouseTooltipControl {
         const timerez = (duration, fxObject) => {
           let seconds = duration;
           setInterval(function () {
-            fxObject.style.backgroundColor = "lightgray";
+            fxObject.style.backgroundColor = "#D6ED17FF";
             if (seconds-- < 0) {
               return;
             }
