@@ -6,7 +6,7 @@ body {
     margin: 100px;
     text-align: center;
     font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-    color: darkblue;
+    color: white;
 }
 
 .links:hover #ctooltip {
@@ -30,8 +30,11 @@ body {
   z-index: 1;
   
   font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  color: darkblue;
+  
 }
+
+
+
 
 #crakatau{
     text-align: center;
@@ -51,11 +54,15 @@ body {
 }
 
 .tt-interior-header{
-
+  color: crimson;
 }
 
-.tt-interior-body{
+b.tt-interior-body{
+  color:darkgoldenrod;
+}
 
+.tt-body-tag-text{
+  color:brown;
 }
 
 

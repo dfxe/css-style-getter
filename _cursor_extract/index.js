@@ -158,7 +158,7 @@ class MouseTooltip {
     return outputTxt;
   }
 
-  prettyTextFormat = (nStr) => {
+  prettyTextFormat(nStr) {
     //adds return character
     let nuStr = nStr;
 
@@ -169,7 +169,20 @@ class MouseTooltip {
     nuStr = nuStr.replace(propertyBegin, " {\n");
     nuStr = nuStr.replace(propertyEnd, "}\n");
     return nuStr;
-  };
+  }
+
+  prettyTextFormatEmphasis(nStr) {
+    let nuArr = [...nStr];
+    for (let index = 0; index < nuArr.length; index++) {
+      if (nuArr[index] === ":" || nuArr[index] === "{") {
+        nuArr[index + 1] = "</b>";
+      } else if (nuArr[index] === "}") {
+        nuArr[index + 1] = "<b>";
+      }
+    }
+    nuArr.unshift("<b>");
+    return nuArr.join("");
+  }
 
   displayCSSData() {
     this.txtToDisplay = "";
@@ -205,9 +218,10 @@ class MouseTooltip {
       pointOfCursorFocus.tagName.toLocaleLowerCase() +
       "\n" +
       this.prettyTextFormat(this.extractCSS("class", pointOfCursorFocus));
-    this.tooltipHeader.innerText = pointOfCursorFocus.tagName.toLocaleLowerCase();
-    this.tooltipBody.innerText = this.prettyTextFormat(
-      this.extractCSS("class", pointOfCursorFocus)
+
+    this.tooltipHeader.innerText = pointOfCursorFocus.tagName.toLocaleLowerCase() + "\n";
+    this.tooltipBody.innerHTML = this.prettyTextFormatEmphasis(
+      this.prettyTextFormat(this.extractCSS("class", pointOfCursorFocus))
     );
   }
 
@@ -251,16 +265,15 @@ class MouseTooltipControl {
     //pp(this.mtStack.printStack())
 
     const followTooltip = (e) => {
-      
-        if (this.current.lockTooltip === false) {
-          this.current.tooltip.style.left = e.pageX + "px";
-          this.current.tooltip.style.top = e.pageY + "px";
-          this.current.cursorX = this.cX;
-          this.current.cursorY = this.cY;
-        }
-    }
+      if (this.current.lockTooltip === false) {
+        this.current.tooltip.style.left = e.pageX + "px";
+        this.current.tooltip.style.top = e.pageY + "px";
+        this.current.cursorX = this.cX;
+        this.current.cursorY = this.cY;
+      }
+    };
 
-    const clickToCopy = (e) =>{
+    const clickToCopy = (e) => {
       if (this.current.lockTooltip === false) {
         navigator.clipboard.writeText(this.current.txtToDisplay);
         this.current.tooltip.style.backgroundColor = "#c8e6c9";
@@ -279,9 +292,7 @@ class MouseTooltipControl {
         timerez(1, this.current.tooltip);
         clearInterval(timerez);
       }
-    }
-
-    
+    };
 
     document.addEventListener("mousemove", followTooltip);
 
@@ -294,7 +305,7 @@ class MouseTooltipControl {
     }, 300);
 
     //TODO element still exists in js runtime (this is bad)
-    //to remove an e listener, an external function needs be developed. 
+    //to remove an e listener, an external function needs be developed.
     //lambdas don't work
     this.current.tooltipDeleteButton.addEventListener("click", () => {
       document.removeEventListener("mousemove", followTooltip);
