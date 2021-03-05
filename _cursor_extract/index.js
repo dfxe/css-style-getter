@@ -32,22 +32,22 @@ class LinkedList {
   }
 
   removeElement(item) {
-    let current = this.head;
+    let mouseTooltip = this.head;
     let previous = null;
 
-    while (current !== null) {
-      if (current.item === item) {
+    while (mouseTooltip !== null) {
+      if (mouseTooltip.item === item) {
         if (previous === null) {
-          this.head = current.next;
+          this.head = mouseTooltip.next;
         } else {
-          previous.next = current.next;
+          previous.next = mouseTooltip.next;
         }
         this.size--;
-        return current.item;
+        return mouseTooltip.item;
       }
 
-      previous = current;
-      current = current.next;
+      previous = mouseTooltip;
+      mouseTooltip = mouseTooltip.next;
     }
 
     return "Nothing to remove";
@@ -119,8 +119,12 @@ class MouseTooltip {
     this.txtToDisplay = "";
   }
 
-  lockTooltipToggle() {
+  toggleLockTooltip() {
     this.lockTooltip = !this.lockTooltip;
+  }
+
+  isLocked() {
+    return this.lockTooltip;
   }
 
   foundInString = (expr, nStr) => {
@@ -129,37 +133,32 @@ class MouseTooltip {
 
   extractCSS(attributesToCheck, elementToView) {
     //needs to include "tagName" check
-    if (
-      
-      elementToView === null ||
-      elementToView === "undefined"
-    ) {
+    if (elementToView === null || elementToView === "undefined") {
       return "";
     }
     let outputTxt = "";
     for (const it of attributesToCheck) {
-        if (elementToView.getAttribute(it)) {
-          for (let i = 0; i < document.styleSheets[0].cssRules.length; i++) {
-            if (
-              this.foundInString(
-                elementToView.getAttribute(it),
-                document.styleSheets[0].cssRules[i].cssText
-              )
+      if (elementToView.getAttribute(it)) {
+        for (let i = 0; i < document.styleSheets[0].cssRules.length; i++) {
+          if (
+            this.foundInString(
+              elementToView.getAttribute(it),
+              document.styleSheets[0].cssRules[i].cssText
             )
-              outputTxt += this.prettyTextFormat(
-                document.styleSheets[0].cssRules[i].cssText
-              );
-          }
+          )
+            outputTxt += this.prettyTextFormat(
+              document.styleSheets[0].cssRules[i].cssText
+            );
         }
-
+      }
     }
 
     return outputTxt;
   }
 
-  prettyTextFormat(nStr) {
+  prettyTextFormat(textToParse) {
     //adds return character
-    let nuStr = nStr;
+    let nuStr = textToParse;
 
     const endLn = /; /gm;
     const propertyBegin = / { /gm;
@@ -170,17 +169,17 @@ class MouseTooltip {
     return nuStr;
   }
 
-  prettyTextFormatEmphasis(nStr) {
-    let nuArr = [...nStr];
-    for (let index = 0; index < nuArr.length; index++) {
-      if (nuArr[index] === ":" || nuArr[index] === "{") {
-        nuArr[index + 1] = "</b>";
-      } else if (nuArr[index] === "}") {
-        nuArr[index + 1] = "<b>";
+  prettyTextFormatEmphasis(textToParse) {
+    let tempArr = [...textToParse];
+    for (let index = 0; index < tempArr.length; index++) {
+      if (tempArr[index] === "{") {
+        tempArr[index + 1] = "</b><br>";
+      } else if (tempArr[index+1] === "}") {
+        tempArr[index + 1] = "<b><br><br>";
       }
     }
-    nuArr.unshift("<b>");
-    return nuArr.join("");
+    tempArr.unshift("<b>");
+    return tempArr.join("");
   }
 
   displayCSSData() {
@@ -191,18 +190,7 @@ class MouseTooltip {
       this.cursorX,
       this.cursorY
     );
-
-    /*
-    //class 
-    pp(document
-        .elementFromPoint(this.cursorX, this.cursorY)
-        .getAttribute('class'));
-    //id
-    pp(document
-      .elementFromPoint(this.cursorX, this.cursorY)
-      .getAttribute('id'));
-    */
-    //TODO get htm attributes
+    //TODO extract from elemets that do not have stylesheet written by user
 
     if (typeof pointOfCursorFocus.attributes[0] !== "undefined") {
       pp(
@@ -216,11 +204,16 @@ class MouseTooltip {
     this.txtToDisplay =
       pointOfCursorFocus.tagName.toLocaleLowerCase() +
       "\n" +
-      this.prettyTextFormat(this.extractCSS(TooltipUtils.legalInput, pointOfCursorFocus));
+      this.prettyTextFormat(
+        this.extractCSS(TooltipUtils.legalInput, pointOfCursorFocus)
+      );
 
-    this.tooltipHeader.innerText = pointOfCursorFocus.tagName.toLocaleLowerCase() + "\n";
+    this.tooltipHeader.innerText =
+      pointOfCursorFocus.tagName.toLocaleLowerCase() + "\n";
     this.tooltipBody.innerHTML = this.prettyTextFormatEmphasis(
-      this.prettyTextFormat(this.extractCSS(TooltipUtils.legalInput, pointOfCursorFocus))
+      this.prettyTextFormat(
+        this.extractCSS(TooltipUtils.legalInput, pointOfCursorFocus)
+      )
     );
   }
 
@@ -230,7 +223,7 @@ class MouseTooltip {
 class MouseTooltipControl {
   constructor() {
     [this.cX, this.cY] = [0, 0];
-    this.current;
+    this.mouseTooltip;
     this.mtLL = new LinkedList();
     document.addEventListener("keydown", (e) => {
       //doesn't work, lockTooltip var is not being accessed properly
@@ -239,12 +232,12 @@ class MouseTooltipControl {
       }
       switch (e.code) {
         case "KeyC":
-          this.current.lockTooltip = true;
+          this.mouseTooltip.lockTooltip = true;
           this.createMouseTooltip();
           break;
         case "KeyS":
           //control switch to stack
-          this.current.lockTooltipToggle();
+          this.mouseTooltip.toggleLockTooltip();
           break;
         default:
           break;
@@ -257,27 +250,37 @@ class MouseTooltipControl {
     });
   }
 
+  copyFX(byObject) {
+    byObject.tooltip.style.backgroundColor = "#c8e6c9";
+    byObject.tooltipHeader.innerText = "CSS now on clipboard.";
+    byObject.tooltipBody.innerText = "";
+  }
+
+  copyFN() {
+    navigator.clipboard.writeText(this.mouseTooltip.txtToDisplay);
+  }
+
   createMouseTooltip() {
-    this.current = new MouseTooltip();
-    this.mtLL.add(this.current);
+    this.mouseTooltip = new MouseTooltip();
+    this.mtLL.add(this.mouseTooltip);
     //pp(this.mtStack.printStack())
 
     const followTooltip = (e) => {
-      if (this.current.lockTooltip === false) {
-        this.current.tooltip.style.left = e.pageX + "px";
-        this.current.tooltip.style.top = e.pageY + "px";
-        this.current.cursorX = this.cX;
-        this.current.cursorY = this.cY;
+      if (this.mouseTooltip.isLocked() === false) {
+        this.mouseTooltip.tooltip.style.left = e.pageX + "px";
+        this.mouseTooltip.tooltip.style.top = e.pageY + "px";
+        this.mouseTooltip.cursorX = this.cX;
+        this.mouseTooltip.cursorY = this.cY;
       }
     };
 
-    const clickToCopy = (e) => {
-      if (this.current.lockTooltip === false) {
-        navigator.clipboard.writeText(this.current.txtToDisplay);
-        this.current.tooltip.style.backgroundColor = "#c8e6c9";
-        this.current.tooltipHeader.innerText = "CSS now on clipboard.";
-        this.current.tooltipBody.innerText = "";
-        const timerez = (duration, fxObject) => {
+    const clickToCopy = () => {
+      if (this.mouseTooltip.isLocked() === false) {
+        this.copyFN();
+
+        this.copyFX(this.mouseTooltip);
+
+        const revertTooltipToStyleDefault = (duration, fxObject) => {
           let seconds = duration;
           setInterval(function () {
             fxObject.style.backgroundColor = "#D6ED17FF";
@@ -287,25 +290,30 @@ class MouseTooltipControl {
           }, 1000);
         };
 
-        timerez(1, this.current.tooltip);
-        clearInterval(timerez);
+        revertTooltipToStyleDefault(1, this.mouseTooltip.tooltip);
+        clearInterval(revertTooltipToStyleDefault);
+      }
+    };
+
+    const clickToControl = () =>{
+      if(document.elementFromPoint(this.cX, this.cY).className==="ctts"){
+        this.mouseTooltip.tooltip = document.elementFromPoint(this.cX, this.cY);
       }
     };
 
     document.addEventListener("mousemove", followTooltip);
 
     document.addEventListener("mousedown", clickToCopy);
+    document.addEventListener("mousedown", clickToControl);
 
     setInterval(() => {
-      if (this.current.lockTooltip === false) {
-        this.current.displayCSSData();
+      if (this.mouseTooltip.isLocked() === false) {
+        this.mouseTooltip.displayCSSData();
       }
     }, 300);
 
     //TODO element still exists in js runtime (this is bad)
-    //to remove an e listener, an external function needs be developed.
-    //lambdas don't work
-    this.current.tooltipDeleteButton.addEventListener("click", () => {
+    this.mouseTooltip.tooltipDeleteButton.addEventListener("click", () => {
       document.removeEventListener("mousemove", followTooltip);
 
       document.removeEventListener("mousedown", clickToCopy);
