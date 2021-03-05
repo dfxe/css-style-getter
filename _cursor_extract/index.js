@@ -175,7 +175,7 @@ class MouseTooltip {
       if (tempArr[index] === "{") {
         tempArr[index + 1] = "</b><br>";
       } else if (tempArr[index+1] === "}") {
-        tempArr[index + 1] = "<b><br><br>";
+        tempArr[index + 1] = "<b><br>}";
       }
     }
     tempArr.unshift("<b>");
