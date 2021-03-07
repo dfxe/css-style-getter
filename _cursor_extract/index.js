@@ -11,49 +11,6 @@ class LinkedNode {
   }
 }
 
-class LinkedList {
-  constructor() {
-    this.head = null;
-    this.size = 0;
-  }
-
-  add(item) {
-    let addedNode = new LinkedNode(item);
-    let currentNode = null;
-    if (this.head === null) {
-      this.head = addedNode;
-    } else {
-      currentNode = this.head;
-      while (currentNode.next) {
-        currentNode = currentNode.next;
-      }
-      currentNode.next = addedNode;
-    }
-  }
-
-  removeElement(item) {
-    let mouseTooltip = this.head;
-    let previous = null;
-
-    while (mouseTooltip !== null) {
-      if (mouseTooltip.item === item) {
-        if (previous === null) {
-          this.head = mouseTooltip.next;
-        } else {
-          previous.next = mouseTooltip.next;
-        }
-        this.size--;
-        return mouseTooltip.item;
-      }
-
-      previous = mouseTooltip;
-      mouseTooltip = mouseTooltip.next;
-    }
-
-    return "Nothing to remove";
-  }
-}
-
 class TooltipUtils {
   static idNum = 0;
   static lastTooltipId = "";
@@ -127,9 +84,9 @@ class MouseTooltip {
     return this.lockTooltip;
   }
 
-  foundInString = (expr, nStr) => {
+  foundInString(expr, nStr) {
     return nStr.match(expr) !== null;
-  };
+  }
 
   extractCSS(attributesToCheck, elementToView) {
     //needs to include "tagName" check
@@ -174,7 +131,7 @@ class MouseTooltip {
     for (let index = 0; index < tempArr.length; index++) {
       if (tempArr[index] === "{") {
         tempArr[index + 1] = "</b><br>";
-      } else if (tempArr[index+1] === "}") {
+      } else if (tempArr[index + 1] === "}") {
         tempArr[index + 1] = "<b><br>}";
       }
     }
@@ -192,14 +149,14 @@ class MouseTooltip {
     );
     //TODO extract from elemets that do not have stylesheet written by user
 
-    if (typeof pointOfCursorFocus.attributes[0] !== "undefined") {
+    /*if (typeof pointOfCursorFocus.attributes[0] !== undefined) {
       pp(
         pointOfCursorFocus.attributes[0].name +
           "=" +
           pointOfCursorFocus.attributes[0].value +
           "\n"
       );
-    }
+    }*/
 
     this.txtToDisplay =
       pointOfCursorFocus.tagName.toLocaleLowerCase() +
@@ -217,14 +174,129 @@ class MouseTooltip {
     );
   }
 
-  editCSS() {}
+  separateTextValues(text) {
+    let tempArr = [...text];
+    for (let index = 0; index < tempArr.length; index++) {
+      const element = array[index];
+    }
+  }
+
+  editCSS() {
+    //TODO be able to edit css directly from tooltip
+  }
 }
 
-class MouseTooltipControl {
-  constructor() {
+class MouseAttributes {
+  constructor(tooltipInstance, mousePositiontReference) {
+    this.mouseTooltip = tooltipInstance;
     [this.cX, this.cY] = [0, 0];
+    this.sleeps = false;
+
+    document.addEventListener("mousemove", (e) => {
+      this.cX = e.pageX;
+      this.cY = e.pageY;
+    });
+  }
+
+  isSleeping(){
+    return this.sleeps;
+  }
+
+  getPoint() {
+    return [this.cX, this.cY];
+  }
+
+  followTooltip = (e) => {
+    if(!this.isSleeping()){
+    if (this.mouseTooltip.isLocked() === false) {
+      this.mouseTooltip.tooltip.style.left = e.pageX + "px";
+      this.mouseTooltip.tooltip.style.top = e.pageY + "px";
+      this.mouseTooltip.cursorX = this.cX;
+      this.mouseTooltip.cursorY = this.cY;
+    }
+  }
+  };
+
+  clickToCopy = () => {
+    if(!this.isSleeping()){
+    if (this.mouseTooltip.isLocked() === false) {
+      const copyFX = (byObject) => {
+        byObject.tooltip.style.backgroundColor = "#c8e6c9";
+        byObject.tooltipHeader.innerText = "CSS now on clipboard.";
+        byObject.tooltipBody.innerText = "";
+      };
+
+      const copyFN = () => {
+        navigator.clipboard.writeText(this.mouseTooltip.txtToDisplay);
+      };
+
+      copyFN();
+
+      copyFX(this.mouseTooltip);
+
+      const revertTooltipToStyleDefault = (duration, fxObject) => {
+        let seconds = duration;
+        setInterval(function () {
+          fxObject.style.backgroundColor = "#D6ED17FF";
+          if (seconds-- < 0) {
+            return;
+          }
+        }, 1000);
+      };
+
+      revertTooltipToStyleDefault(1, this.mouseTooltip.tooltip);
+      clearInterval(revertTooltipToStyleDefault);
+    }
+  }
+  };
+
+  clickToControl = () => {
+    if(!this.isSleeping()){
+      if (document.elementFromPoint(this.cX, this.cY).className === "ctts") {
+        //this.mouseTooltip.tooltip.id = "";
+        //
+        this.mouseTooltip.tooltip = document.elementFromPoint(this.cX, this.cY);
+        this.mouseTooltip.lockTooltip = false;
+        //this.mouseTooltip.tooltip.id = "selected-ctts";
+      }
+    }
+  };
+
+  clickToRemove() {
+    if(!this.isSleeping()){
+    this.mouseTooltip.tooltipDeleteButton.addEventListener("click", () => {
+      document.removeEventListener("mousemove", this.followTooltip);
+      document.removeEventListener("mousedown", this.clickToControl);
+      document.removeEventListener("mousedown", this.clickToCopy);
+
+      TooltipUtils.destroyTooltip(
+        document.elementFromPoint(this.cX, this.cY).parentElement.id
+      );
+    });
+  }
+  }
+
+  setDefaultMouseAttributes() {
+    document.addEventListener("mousemove", this.followTooltip);
+
+    document.addEventListener("mousedown", this.clickToCopy);
+    document.addEventListener("mousedown", this.clickToControl);
+
+    this.clickToRemove();
+
+    setInterval(() => {
+      //here previous not current mousetooltip
+      if (this.mouseTooltip.isLocked() === false) {
+        this.mouseTooltip.displayCSSData();
+      }
+    }, 300);
+  }
+}
+
+class MouseTooltipFactory {
+  constructor() {
     this.mouseTooltip;
-    this.mtLL = new LinkedList();
+
     document.addEventListener("keydown", (e) => {
       //doesn't work, lockTooltip var is not being accessed properly
       if (e.defaultPrevented) {
@@ -233,7 +305,7 @@ class MouseTooltipControl {
       switch (e.code) {
         case "KeyC":
           this.mouseTooltip.lockTooltip = true;
-          this.createMouseTooltip();
+          this.makeMouseTooltip();
           break;
         case "KeyS":
           //control switch to stack
@@ -243,86 +315,18 @@ class MouseTooltipControl {
           break;
       }
     });
-
-    document.addEventListener("mousemove", (e) => {
-      this.cX = e.pageX;
-      this.cY = e.pageY;
-    });
   }
 
-  copyFX(byObject) {
-    byObject.tooltip.style.backgroundColor = "#c8e6c9";
-    byObject.tooltipHeader.innerText = "CSS now on clipboard.";
-    byObject.tooltipBody.innerText = "";
-  }
+  makeMouseTooltip() {
+    if (this.mouseTooltip !== null && this.mouseTooltip !== undefined) {
+      this.mouseTooltip.lockTooltip = true;
+    }
 
-  copyFN() {
-    navigator.clipboard.writeText(this.mouseTooltip.txtToDisplay);
-  }
-
-  createMouseTooltip() {
     this.mouseTooltip = new MouseTooltip();
-    this.mtLL.add(this.mouseTooltip);
-    //pp(this.mtStack.printStack())
 
-    const followTooltip = (e) => {
-      if (this.mouseTooltip.isLocked() === false) {
-        this.mouseTooltip.tooltip.style.left = e.pageX + "px";
-        this.mouseTooltip.tooltip.style.top = e.pageY + "px";
-        this.mouseTooltip.cursorX = this.cX;
-        this.mouseTooltip.cursorY = this.cY;
-      }
-    };
-
-    const clickToCopy = () => {
-      if (this.mouseTooltip.isLocked() === false) {
-        this.copyFN();
-
-        this.copyFX(this.mouseTooltip);
-
-        const revertTooltipToStyleDefault = (duration, fxObject) => {
-          let seconds = duration;
-          setInterval(function () {
-            fxObject.style.backgroundColor = "#D6ED17FF";
-            if (seconds-- < 0) {
-              return;
-            }
-          }, 1000);
-        };
-
-        revertTooltipToStyleDefault(1, this.mouseTooltip.tooltip);
-        clearInterval(revertTooltipToStyleDefault);
-      }
-    };
-
-    const clickToControl = () =>{
-      if(document.elementFromPoint(this.cX, this.cY).className==="ctts"){
-        this.mouseTooltip.tooltip = document.elementFromPoint(this.cX, this.cY);
-      }
-    };
-
-    document.addEventListener("mousemove", followTooltip);
-
-    document.addEventListener("mousedown", clickToCopy);
-    document.addEventListener("mousedown", clickToControl);
-
-    setInterval(() => {
-      if (this.mouseTooltip.isLocked() === false) {
-        this.mouseTooltip.displayCSSData();
-      }
-    }, 300);
-
-    //TODO element still exists in js runtime (this is bad)
-    this.mouseTooltip.tooltipDeleteButton.addEventListener("click", () => {
-      document.removeEventListener("mousemove", followTooltip);
-
-      document.removeEventListener("mousedown", clickToCopy);
-      TooltipUtils.destroyTooltip(
-        document.elementFromPoint(this.cX, this.cY).parentElement.id
-      );
-    });
+    new MouseAttributes(this.mouseTooltip).setDefaultMouseAttributes();
   }
 }
 
-const th = new MouseTooltipControl();
-th.createMouseTooltip();
+const th = new MouseTooltipFactory();
+th.makeMouseTooltip();
