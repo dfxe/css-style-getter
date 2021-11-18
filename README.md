@@ -1,5 +1,6 @@
 <img src="https://github.com/uKruel/css-style-getter/blob/main/_cursor_extract/_images/cssstylegetter_logo.png?raw=true" width="300em" height="300em"></img>
 <h1>CSS Style Getter</h1>
+<h2>Prototype faster.</h2>
 
 Copy the CSS style of an element with just one click.<br><br>
 
