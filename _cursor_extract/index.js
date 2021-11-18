@@ -193,12 +193,13 @@ class MouseAttributes {
     this.sleeps = false;
 
     document.addEventListener("mousemove", (e) => {
+      e.preventDefault();
       this.cX = e.pageX;
       this.cY = e.pageY;
     });
   }
 
-  isSleeping(){
+  isSleeping() {
     return this.sleeps;
   }
 
@@ -207,51 +208,51 @@ class MouseAttributes {
   }
 
   followTooltip = (e) => {
-    if(!this.isSleeping()){
-    if (this.mouseTooltip.isLocked() === false) {
-      this.mouseTooltip.tooltip.style.left = e.pageX + "px";
-      this.mouseTooltip.tooltip.style.top = e.pageY + "px";
-      this.mouseTooltip.cursorX = this.cX;
-      this.mouseTooltip.cursorY = this.cY;
+    if (!this.isSleeping()) {
+      if (this.mouseTooltip.isLocked() === false) {
+        this.mouseTooltip.tooltip.style.left = e.pageX + "px";
+        this.mouseTooltip.tooltip.style.top = e.pageY + "px";
+        this.mouseTooltip.cursorX = this.cX;
+        this.mouseTooltip.cursorY = this.cY;
+      }
     }
-  }
   };
 
   clickToCopy = () => {
-    if(!this.isSleeping()){
-    if (this.mouseTooltip.isLocked() === false) {
-      const copyFX = (byObject) => {
-        byObject.tooltip.style.backgroundColor = "#c8e6c9";
-        byObject.tooltipHeader.innerText = "CSS now on clipboard.";
-        byObject.tooltipBody.innerText = "";
-      };
+    if (!this.isSleeping()) {
+      if (this.mouseTooltip.isLocked() === false) {
+        const copyFX = (byObject) => {
+          byObject.tooltip.style.backgroundColor = "#c8e6c9";
+          byObject.tooltipHeader.innerText = "CSS now on clipboard.";
+          byObject.tooltipBody.innerText = "";
+        };
 
-      const copyFN = () => {
-        navigator.clipboard.writeText(this.mouseTooltip.txtToDisplay);
-      };
+        const copyFN = () => {
+          navigator.clipboard.writeText(this.mouseTooltip.txtToDisplay);
+        };
 
-      copyFN();
+        copyFN();
 
-      copyFX(this.mouseTooltip);
+        copyFX(this.mouseTooltip);
 
-      const revertTooltipToStyleDefault = (duration, fxObject) => {
-        let seconds = duration;
-        setInterval(function () {
-          fxObject.style.backgroundColor = "#D6ED17FF";
-          if (seconds-- < 0) {
-            return;
-          }
-        }, 1000);
-      };
+        const revertTooltipToStyleDefault = (duration, fxObject) => {
+          let seconds = duration;
+          setInterval(function () {
+            fxObject.style.backgroundColor = "#D6ED17FF";
+            if (seconds-- < 0) {
+              return;
+            }
+          }, 1000);
+        };
 
-      revertTooltipToStyleDefault(1, this.mouseTooltip.tooltip);
-      clearInterval(revertTooltipToStyleDefault);
+        revertTooltipToStyleDefault(1, this.mouseTooltip.tooltip);
+        clearInterval(revertTooltipToStyleDefault);
+      }
     }
-  }
   };
 
   clickToControl = () => {
-    if(!this.isSleeping()){
+    if (!this.isSleeping()) {
       if (document.elementFromPoint(this.cX, this.cY).className === "ctts") {
         //this.mouseTooltip.tooltip.id = "";
         //
@@ -263,17 +264,17 @@ class MouseAttributes {
   };
 
   clickToRemove() {
-    if(!this.isSleeping()){
-    this.mouseTooltip.tooltipDeleteButton.addEventListener("click", () => {
-      document.removeEventListener("mousemove", this.followTooltip);
-      document.removeEventListener("mousedown", this.clickToControl);
-      document.removeEventListener("mousedown", this.clickToCopy);
+    if (!this.isSleeping()) {
+      this.mouseTooltip.tooltipDeleteButton.addEventListener("click", () => {
+        document.removeEventListener("mousemove", this.followTooltip);
+        document.removeEventListener("mousedown", this.clickToControl);
+        document.removeEventListener("mousedown", this.clickToCopy);
 
-      TooltipUtils.destroyTooltip(
-        document.elementFromPoint(this.cX, this.cY).parentElement.id
-      );
-    });
-  }
+        TooltipUtils.destroyTooltip(
+          document.elementFromPoint(this.cX, this.cY).parentElement.id
+        );
+      });
+    }
   }
 
   setDefaultMouseAttributes() {
